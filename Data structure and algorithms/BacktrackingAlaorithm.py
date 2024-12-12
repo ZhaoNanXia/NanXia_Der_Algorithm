@@ -311,3 +311,91 @@ PEP = PermuteProblem()
 输入：nums = [1,1,2]
 输出：[[1,1,2], [1,2,1], [2,1,1]]
 """
+
+
+class SubsetProblem:
+    """ 子集问题 """
+    @staticmethod
+    def subsets(nums):
+        """ 78.子集 """
+        path = []
+        res = []
+
+        def backtrack(nums, start_index):
+            res.append(path[:])
+            print(f'得到一个子集->path: {path}, res: {res}')
+            print('-' * 100)
+            for i in range(start_index, len(nums)):
+                path.append(nums[i])
+                print(f'递归过程->path: {path}')
+                backtrack(nums, i + 1)
+                path.pop()
+                print(f'回溯过程->path: {path}')
+
+        print(f'输入数组nums：{nums}')
+        print('-' * 100)
+        backtrack(nums, 0)
+        print('-' * 100)
+        print(f'输出结果res：{res}')
+        return res
+
+    @staticmethod
+    def subsets_unique(nums):
+        """ 90.子集Ⅱ """
+        path = []
+        res = []
+
+        def backtrack(nums, start_index):
+            res.append(path[:])
+            print(f'得到一个子集->path: {path}, res: {res}')
+            print('-' * 100)
+            for i in range(start_index, len(nums)):
+                if i > start_index and nums[i] == nums[i - 1]:
+                    print(f'遇到重复元素{nums[i]}->path: {path}, res: {res}')
+                    print('-' * 100)
+                    continue
+                path.append(nums[i])
+                print(f'递归过程->path: {path}')
+                backtrack(nums, i + 1)
+                path.pop()
+                print(f'回溯过程->path: {path}')
+
+        print(f'输入数组nums：{nums}')
+        print('-' * 100)
+        nums.sort()
+        print(f'排序后的输入数组nums：{nums}')
+        print('-' * 100)
+        backtrack(nums, 0)
+        print('-' * 100)
+        print(f'输出结果res：{res}')
+        return res
+
+    @staticmethod
+    def find_sub_sequences(nums):
+        """ 491.非递减子序列 """
+        path = []
+        res = []
+
+        def backtrack(nums, start_index):
+            if len(path) >= 2:
+                res.append(path[:])
+            if start_index == len(nums):
+                return
+            num_used = set()
+            for i in range(start_index, len(nums)):
+                if (path and nums[i] < path[-1]) or nums[i] in num_used:
+                    continue
+                num_used.add(nums[i])
+                path.append(nums[i])
+                backtrack(nums, i + 1)
+                path.pop()
+
+        backtrack(nums, 0)
+        return res
+
+
+SP = SubsetProblem()
+# lists = [1, 3, 1]
+# print(SP.subsets(lists))
+# print(SP.subsets_unique(lists))
+# print(SP.find_sub_sequences(lists))
