@@ -17,6 +17,7 @@ BN3 = nn.BatchNorm3d(num_features=4, eps=1e-5, momentum=0.1, affine=True, track_
 class LayerNorm:
     """ 层归一化 """
     def __init__(self, normalized_shape, epsilon=1e-5):
+        super(LayerNorm).__init__()
         self.epsilon = epsilon  # 初始化一个小常数，防止分母为0
         self.gamma = nn.Parameter(torch.ones(normalized_shape))  # 可训练缩放参数：初始化为1
         self.beta = nn.Parameter(torch.zeros(normalized_shape))  # 可训练平移参数：初始化为0
