@@ -40,6 +40,10 @@ class PositionalEncoding(nn.Module):
 
 class LearnablePositionalEncoding(nn.Module):
     def __init__(self, max_len, d_model):
+        """
+        :param max_len: 可以根据需求调整，适用于不同长度的序列
+        :param d_model: 输入词嵌入向量(token)的维度
+        """
         super(LearnablePositionalEncoding, self).__init__()
         # 初始化一个可学习的位置编码参数
         self.pos_embed = nn.Parameter(torch.randn(max_len, d_model))
