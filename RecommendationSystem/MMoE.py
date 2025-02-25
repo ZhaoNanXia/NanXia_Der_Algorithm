@@ -30,7 +30,7 @@ class Gate(nn.Module):
         super(Gate, self).__init__()
         self.gate_layer = nn.Sequential(
             nn.Linear(input_dim, num_experts),
-            nn.Softmax(dim=1),
+            nn.Softmax(dim=-1),
             nn.Dropout(dropout)
         )
 
@@ -48,7 +48,7 @@ class Task(nn.Module):
         super(Task, self).__init__()
         self.task_layer = nn.Sequential(
             nn.Linear(input_dim, output_dim),
-            nn.Softmax(dim=1),
+            nn.Softmax(dim=-1),
             nn.Dropout(dropout)
         )
 
