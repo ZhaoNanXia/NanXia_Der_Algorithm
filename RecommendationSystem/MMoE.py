@@ -22,14 +22,14 @@ class Expert(nn.Module):
 
 class Gate(nn.Module):
     """ 单个门控网络 """
-    def __init__(self, input_dim, num_tasks, dropout=0.1):
+    def __init__(self, input_dim, num_experts, dropout=0.1):
         """
         :param input_dim: 输入特征的维度
-        :param num_tasks: 任务数量
+        :param num_experts: 专家数量，输出维度要与专家数量匹配，得以使每个专家都有一个权重
         """
         super(Gate, self).__init__()
         self.gate_layer = nn.Sequential(
-            nn.Linear(input_dim, num_tasks),
+            nn.Linear(input_dim, num_experts),
             nn.Softmax(dim=1),
             nn.Dropout(dropout)
         )
