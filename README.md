@@ -14,6 +14,8 @@
     记录《推荐系统》相关的代码
     -----------------------------------
     1、AUC.py AUC及GAUC的代码实现
+    2、MMoE.py MMoE模型的实现
+    3、PLE.py PLE模型的实现
 
 ### Transformer
     Transformer架构的学习，对应模块的代码实现
