@@ -2239,26 +2239,57 @@ def unique_paths(m: int, n: int) -> int:
     return dp[-1][-1]
 
 
+def unique_paths_1(m: int, n: int) -> int:
+    """
+    LeetCode-62.不同路径
+    时间复杂度：O(m×n)，双重循环
+    空间复杂度：O(n)，仅维护大小为n的dp数组
+    """
+    dp = [1] * n
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[j] = dp[j] + dp[j - 1]
+    return dp[-1]
+
 # print(unique_paths(3, 7))
 
 
 def min_path_sum(grid: List[List[int]]) -> int:
     """
     LeetCode-64.最小路径和
-    时间复杂度：O(m×n)
-    空间复杂度：O(m×n)
+    时间复杂度：O(m×n)，双重循环
+    空间复杂度：O(m×n)，维护一个二维dp数组
     """
     m, n = len(grid), len(grid[0])
     dp = [[0] * n for _ in range(m)]
     dp[0][0] = grid[0][0]
-    for i in range(1, m):
+    for i in range(1, m):  # 初始化第一列
         dp[i][0] = dp[i - 1][0] + grid[i][0]
-    for i in range(1, n):
+    for i in range(1, n):  # 初始化第一行
         dp[0][i] = dp[0][i - 1] + grid[0][i]
     for i in range(1, m):
         for j in range(1, n):
             dp[i][j] = min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j]
     return dp[-1][-1]
+
+
+def min_path_sum_1(grid: List[List[int]]) -> int:
+    """
+    LeetCode-64.最小路径和
+    时间复杂度：O(m×n)，双重循环
+    空间复杂度：O(1)，原地修改
+    """
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if i == j == 0:
+                continue
+            elif i == 0:  # 初始化第一行
+                grid[i][j] = grid[i][j - 1] + grid[i][j]
+            elif j == 0:  # 初始化第一列
+                grid[i][j] = grid[i - 1][j] + grid[i][j]
+            else:
+                grid[i][j] = min(grid[i][j - 1], grid[i - 1][j]) + grid[i][j]
+    return grid[-1][-1]
 
 
 # grids = [[1, 3, 1], [1, 5, 1], [4, 2, 1]]
@@ -2268,44 +2299,83 @@ def min_path_sum(grid: List[List[int]]) -> int:
 def longest_palindrome(s: str) -> str:
     """
     LeetCode-5.最长回文子串
+    中心扩散法
     时间复杂度：O(n^2)，外层循环O(n)，内层回文中心最多向外扩展n次也是O(n)
-    空间复杂度：O(1)
+    空间复杂度：O(1)，仅使用常数个变量
     """
     def palindrome(s, left, right):
+        """ 两端扩散，寻找回文子串 """
         while 0 <= left < len(s) and 0 <= right < len(s) and s[left] == s[right]:
             left -= 1
             right += 1
-        return left + 1, right
+        return left + 1, right - 1
 
     n = len(s)
-    res = [0, 0]
+    start, end = 0, 0  # 记录最长回文子串的起始、终止位置
     for i in range(n):
-        start, end = palindrome(s, i, i)
-        if end - start > res[1] - res[0]:
-            res[0], res[1] = start, end
-    for i in range(n):
-        start, end = palindrome(s, i, i + 1)
-        if end - start > res[1] - res[0]:
-            res[0], res[1] = start, end
-    return s[res[0]: res[1]]
+        start1, end1 = palindrome(s, i, i)  # 回文中心为1个字符时的情况
+        if end1 - start1 > end - start:
+            start, end = start1, end1
+        start2, end2 = palindrome(s, i, i + 1)  # 回文中心为2个字符时的情况
+        if end2 - start2 > end - start:
+            start, end = start2, end2
+    return s[start: end + 1]
+
+
+def longest_palindrome_1(s: str) -> str:
+    """
+    LeetCode-5.最长回文子串
+    动态规划
+    时间复杂度：O(n^2)，外层循环O(n)，内层回文中心最多向外扩展n次也是O(n)
+    空间复杂度：O(n^2)，维护一个二维dp数组
+    """
+    n = len(s)
+    if n < 2:
+        return s
+    max_len = 1  # 记录最长回文子串的长度
+    start = 0  # 记录最长回文子串的起始索引
+    # dp[i][j]表示s[i:j]是否是回文串
+    dp = [[False] * n for _ in range(n)]
+    for i in range(n):  # 初始化所有长度为1的子串都是回文串
+        dp[i][i] = True
+    for l in range(2, n + 1):  # 子串长度从2到n
+        for i in range(n):  # 遍历左边界
+            j = l + i - 1  # 根据子串长度和左边界计算右边界
+            if j >= n:  # 若右边界越界，则退出当前循环
+                break
+            if s[i] != s[j]:  # 若左右边界对应的字符不同，则当前子串不是回文串
+                dp[i][j] = False
+            else:  # 若左右边界对应的字符相同
+                if j - i < 3:  # 若当前回文串长度为2或3
+                    dp[i][j] = True
+                else:  # 若当前回文串长度大于3
+                    dp[i][j] = dp[i + 1][j - 1]
+            if dp[i][j] and j - i + 1 > max_len:  # 更新最长回文串的长度和起始索引
+                max_len = j - i + 1
+                start = i
+    return s[start: start + max_len]
 
 
 # string = "babad"
-# print(longest_palindrome(string))
+# print(longest_palindrome_1(string))
 
 
 def longest_common_subsequence(text1: str, text2: str) -> int:
     """
     LeetCode-1143.最长公共子序列
+    动态规划
+    时间复杂度：O(n1×n2),双重循环遍历
+    空间复杂度：O(n1×n2),维护一个二维dp数组
     """
     n1, n2 = len(text1), len(text2)
     # text1中以text1[i-1]结尾的字符串 和 text2中以text2[j-1]结尾的字符串 的最长公共子序列
     dp = [[0] * (n2 + 1) for _ in range(n1 + 1)]
     for i in range(1, n1 + 1):
         for j in range(1, n2 + 1):
-            if text1[i - 1] == text2[j - 1]:
+            if text1[i - 1] == text2[j - 1]:  # 若字符相同，最长公共序列长度+1
                 dp[i][j] = dp[i - 1][j - 1] + 1
-            else:
+            else:  # 若字符不同，则最长公共序列长度为
+                # text1[0:i - 1]和text2[0:j]的最长公共序列长度 和 text1[0:i]和text2[0:j - 1]的最长公共序列长度 中的较大值
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
     return dp[-1][-1]
 
@@ -2316,12 +2386,15 @@ def longest_common_subsequence(text1: str, text2: str) -> int:
 def min_distance(word1: str, word2: str) -> int:
     """
     LeetCode-72.编辑距离
+    动态规划
+    时间复杂度：O(n1×n2),双重循环遍历
+    空间复杂度：O(n1×n2),维护一个二维dp数组
     """
     n1, n2 = len(word1), len(word2)
     dp = [[0] * (n2 + 1) for _ in range(n1 + 1)]
-    for i in range(n1 + 1):
+    for i in range(n1 + 1):  # 初始化第一列，转换成空字符所需最少操作数
         dp[i][0] = i
-    for i in range(n2 + 1):
+    for i in range(n2 + 1):  # 初始化第一行，转换成空字符所需最少操作数
         dp[0][i] = i
     for i in range(1, n1 + 1):
         for j in range(1, n2 + 1):
