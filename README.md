@@ -7,6 +7,9 @@
     1、BacktrackingAlgorithm.py 回溯算法
     2、SortAlgorithm.py 十大排序算法
     3、StockProblem.py 股票问题
+    4、KnapsackProblem.py 背包问题
+    5、Robproblem.py 打家劫舍问题
+    6、Top100.py LeetCode-Top100问题总结
 
 ### DeepSeek
     DeepSeek源码的学习，尚未整理完毕！
