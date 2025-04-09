@@ -1689,10 +1689,12 @@ def find_median_sorted_arrays(nums1: List[int], nums2: List[int]) -> float:
 def is_valid(s: str) -> bool:
     """
     LeetCode-20.有效的括号
+    时间复杂度：O(n)，对字符串进行一次遍历
+    空间复杂度：O(n)，最坏情况下，当输入全是左括号时，栈中会压入n个右括号
     """
     stack = []
     for i in range(len(s)):
-        if stack and s[i] == stack[-1]:
+        if stack and s[i] == stack[-1]:  # 栈不空且遍历到右括号，且等于栈顶元素
             stack.pop()
         elif s[i] == '(':
             stack.append(')')
@@ -1700,9 +1702,9 @@ def is_valid(s: str) -> bool:
             stack.append(']')
         elif s[i] == '{':
             stack.append('}')
-        else:
+        else:  # 遍历到右括号，但栈为空或与栈顶元素不相等，直接返回False
             return False
-    return not stack
+    return not stack  # 返回栈是否为空，栈为空则代表所有括号都被匹配了，不为空则代表栈中尚有未匹配的左括号
 
 
 # string = '('
@@ -1761,15 +1763,18 @@ def decode_string(s: str) -> str:
 def daily_temperatures(temperatures: List[int]) -> List[int]:
     """
     LeetCode-739.每日温度
+    单调栈解法
+    时间复杂度：O(n)，对数组进行一次遍历
+    空间复杂度：O(n)，维护一个单调栈和一个保存结果的数组（大小为n）
     """
     n = len(temperatures)
     res = [0] * n
-    stack = [0]
+    stack = [0]  # 存储尚未找到下一次更高温度的天的下标
     for i in range(1, n):
-        while stack and temperatures[i] > temperatures[stack[-1]]:
+        while stack and temperatures[i] > temperatures[stack[-1]]:  # 栈不空且当前温度大于栈顶元素对应的温度
             idx = stack.pop()
-            res[idx] = i - idx
-        stack.append(i)
+            res[idx] = i - idx  # 计算间隔天数
+        stack.append(i)  # 无论哪种情况，最终都需要将当前下标压入栈中
     return res
 
 
