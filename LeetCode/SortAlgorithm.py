@@ -52,7 +52,6 @@ class SortAlgorithm:
         """ 快速排序辅助函数 """
         if first < last:
             pivot = nums[first]
-
             i, j = first + 1, last
             while True:
                 while i <= j and nums[i] <= pivot:
@@ -273,8 +272,8 @@ class SortAlgorithm:
         return nums
 
 
-lists = [1, 4, 22, 7, 15, 6, 33, 8]
-sort = SortAlgorithm()
+# lists = [1, 4, 22, 7, 15, 6, 33, 8]
+# sort = SortAlgorithm()
 # print(sort.merge_sort(lists))
 # print(sort.quick_sort(lists))
 # print(sort.bubble_sort(lists))
@@ -284,11 +283,143 @@ sort = SortAlgorithm()
 # print(sort.bucket_sort(lists))
 # print(sort.shell_sort(lists))
 # print(sort.counting_sort(lists))
-print(sort.radix_sort(lists))
+# print(sort.radix_sort(lists))
 
 
+def quick_sort(nums):
+    """
+    快速排序
+    时间复杂度：1、理想情况下，每个选择的分割值恰好将数组均分为两个大小相等的子数组时，
+                  递归的深度为log(n)，因此递归的时间复杂度为0(logn)
+                  而每层递归都需要遍历整个数组，时间复杂度为0(n)
+                  总的时间复杂度为0(nlogn)
+              2、平均情况下，分隔值的划分大概率接近平衡，因此平均时间复杂度仍为0(nlogn)
+              3、最坏情况下，当输入数组已经是有序的，且每次选择第一个元素作为分割值时进行划分时，
+                  会导致极为不平衡的子数组，即一个大小为0，一个大小为n，
+                  此时递归深度为n，因此递归的时间复杂度为0(n)。
+                  而每层递归都需要遍历整个数组，时间复杂度为0(n)
+                  总的时间复杂度为0(n^2)
+    空间复杂度：快速排序是原地排序，非递归部分的空间复杂度为O(1)，因此只考虑递归的空间复杂度
+              1、最优/平均情况：递归深度为logn，空间复杂度为O(logn)。
+              2、最坏情况：递归深度为n，空间复杂度退化为O(n)
+    """
+    return quick_sort_helper(nums, 0, len(nums) - 1)
 
 
+def quick_sort_helper(nums, left, right):
+    """ 对数组递归地进行快速排序 """
+    if left < right:
+        pivot = partition(nums, left, right)  # 找到划分数组的分割点
+        quick_sort_helper(nums, left, pivot - 1)  # 对分割点左侧数组递归排序
+        quick_sort_helper(nums, pivot + 1, right)  # 对分割点右侧数组递归排序
+    return nums
+
+
+def partition(nums, left, right):
+    """为选定的分割值找到一个合适的位置，使将数组中小于分割值的元素置于分割值左侧，大于分割值的元素置于分割值右侧 """
+    pivot_val = nums[left]  # 选择数组的第一个元素为分割值
+    i, j = left + 1, right  # 双指针，从两边向中间遍历
+    while True:
+        # 若i<=j且当前i指针指向的元素小于等于分割值，则i向右移动一位
+        while i <= j and nums[i] <= pivot_val:
+            i += 1
+        # 若i<=j且当前j指针指向的元素大于等于分割值，则j向左移动一位
+        while i <= j and nums[j] >= pivot_val:
+            j -= 1
+        # 若i<=j且当前i指针指向的元素大于等于分割值，j指针指向的元素小于等于分割值
+        # 此时两个指针都无法移动，则将两个指针指向的元素进行交换
+        if i <= j:
+            nums[i], nums[j] = nums[j], nums[i]
+            i += 1
+            j -= 1
+        # 遍历结束，推出循环
+        else:
+            break
+    # 最终将分割值移动到合适的分割位置上，即位置j(遍历结束时，j指针所指的元素是小于基准值的元素)
+    nums[left], nums[j] = nums[j], nums[left]
+    return j
+
+
+# lists = [5, 4, 22, 7, 15, 6, 33, 8]
+# print(quick_sort(lists))
+
+
+def merge_sort(nums):
+    """
+    归并排序
+    时间复杂度：分解阶段，将数组递归地二分，直到子数组长度为1。分解次数即递归深度，为logn，时间复杂度为O(logn)
+              合并阶段，每层递归地合并两个子数组，合并操作的比较次数和赋值次数与当前子数组的总长度成正比，即每层合并的时间复杂度为O(n)
+              总的时间复杂度为0(nlogn)
+    空间复杂度：递归过程中栈的调用带来的空间复杂度为O(logn)
+              合并过程中维护了一个大小为n的数组储存最终结果，空间复杂度为O(n)
+              合并操作中的数组占主导地位，因此总的空间复杂度为O(n)
+    """
+    n = len(nums)
+    if n <= 1:
+        return nums
+    # 递归分解阶段
+    mid = n // 2
+    left = nums[:mid]
+    right = nums[mid:]
+    left = merge_sort(left)
+    right = merge_sort(right)
+    # 合并阶段
+    res = [0] * n
+    i, j, k = 0, 0, 0
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            res[k] = left[i]
+            k += 1
+            i += 1
+        else:
+            res[k] = right[j]
+            k += 1
+            j += 1
+    while i < len(left):
+        res[k] = left[i]
+        k += 1
+        i += 1
+    while j < len(right):
+        res[k] = right[j]
+        k += 1
+        j += 1
+    return res
+
+
+lists = [5, 4, 22, 7, 15, 6, 33, 8]
+# print(merge_sort(lists))
+
+
+def quick_sort_1(nums):
+    return quick_sort_helper(nums, 0, len(nums) - 1)
+
+
+def quick_sort_helper_1(nums, first, last):
+    if first < last:
+        pivot = partition(nums, first, last)
+        quick_sort_helper_1(nums[:pivot], first, pivot - 1)
+        quick_sort_helper_1(nums[pivot+1:], pivot + 1, last)
+
+
+def partition_1(nums, first, last):
+    pivot_val = nums[first]
+    left, right = first + 1, last
+    while True:
+        while left <= right and nums[left] < pivot_val:
+            left += 1
+        while left <= right and nums[right] > pivot_val:
+            right -= 1
+        if left <= right:
+            nums[left], nums[right] = nums[right], nums[left]
+            left += 1
+            right -= 1
+        else:
+            break
+    nums[first], nums[left] = nums[left], nums[first]
+    return left
+
+
+print(quick_sort_1(lists))
 
 
 
